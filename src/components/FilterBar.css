@@ -1,0 +1,36 @@
+.filter-bar {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 0 20px;
+}
+
+.filter-button {
+  padding: 12px 24px;
+  background: #2a2a2a;
+  color: #fff;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  outline: none;
+}
+
+.filter-button:hover {
+  background: #3a3a3a;
+}
+
+.filter-button.active {
+  background: #e50914;
+  border-color: #e50914;
+}
+
+.filter-button.focused {
+  border-color: #fff;
+}
+
+.filter-button.active.focused {
+  border-color: #fff;
+}

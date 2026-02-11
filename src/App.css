@@ -1,0 +1,74 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #0a0a0a;
+  color: #fff;
+  /* Disable mouse scrolling */
+  overflow: hidden;
+}
+
+/* Enable keyboard scrolling while preventing mouse wheel */
+#root {
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  /* Hide scrollbar but keep functionality */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+#root::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* Prevent mouse wheel scrolling */
+body, #root {
+  overscroll-behavior: none;
+}
+
+/* Disable all input elements from being focused via tab */
+input,
+button,
+select,
+textarea,
+a {
+  /* Allow focus via keyboard but not tab */
+  -moz-user-focus: ignore;
+}
+
+/* Ensure buttons can still be focused programmatically and via keyboard */
+button:focus,
+input:focus,
+select:focus,
+textarea:focus,
+a:focus {
+  outline: 2px solid #e50914;
+  outline-offset: 2px;
+}
+
+/* Prevent default tab behavior */
+:focus {
+  outline: none;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+}
+
+button {
+  font-family: inherit;
+}
