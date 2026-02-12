@@ -34,7 +34,10 @@ const Home = () => {
 
       <div className="home-controls">
         <SearchBar />
-        <FilterBar />
+        <div className="home-controls-row">
+          <FilterBar />
+          <Pagination />
+        </div>
       </div>
 
       <main className="home-content">
@@ -43,10 +46,7 @@ const Home = () => {
         ) : error ? (
           <ErrorMessage message={error} onRetry={handleRetry} />
         ) : (
-          <>
-            <MovieGrid movies={movies} />
-            <Pagination />
-          </>
+          <MovieGrid movies={movies} />
         )}
       </main>
     </div>
