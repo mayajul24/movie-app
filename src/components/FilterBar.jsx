@@ -54,19 +54,25 @@ const FilterBar = React.memo(() => {
 
   return (
     <div className="filter-bar">
-      {filters.map((filter) => (
-        <button
-          key={filter.type}
-          className={`filter-button ${
-            activeFilter === filter.type ? 'active' : ''
-          } ${focusedFilter === filter.type ? 'focused' : ''}`}
-          onClick={() => handleFilterClick(filter.type)}
-          onFocus={() => handleFilterFocus(filter.type)}
-          onBlur={handleFilterBlur}
-        >
-          {filter.label}
-        </button>
-      ))}
+      {filters.map((filter) => {
+        const className = [
+          'filter-button',
+          activeFilter === filter.type && 'active',
+          focusedFilter === filter.type && 'focused',
+        ].filter(Boolean).join(' ');
+
+        return (
+          <button
+            key={filter.type}
+            className={className}
+            onClick={() => handleFilterClick(filter.type)}
+            onFocus={() => handleFilterFocus(filter.type)}
+            onBlur={handleFilterBlur}
+          >
+            {filter.label}
+          </button>
+        );
+      })}
     </div>
   );
 });

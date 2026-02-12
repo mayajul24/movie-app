@@ -1,13 +1,20 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { IMAGE_BASE_URL, POSTER_SIZE } from '../constants';
 import './MovieCard.css';
-import {useNavigate} from "react-router-dom";
+
+const PLACEHOLDER_IMAGE = '/placeholder.png';
 
 const MovieCard = React.memo(React.forwardRef(({ movie, isFocused }, ref) => {
+  const navigate = useNavigate();
+
   const posterUrl = movie.poster_path
     ? `${IMAGE_BASE_URL}/${POSTER_SIZE}${movie.poster_path}`
-    : '/placeholder.png';
-  const navigate = useNavigate();
+    : PLACEHOLDER_IMAGE;
+
+  const handleImageError = (e) => {
+    e.target.src = PLACEHOLDER_IMAGE;
+  };
 
   return (
     <div
@@ -15,13 +22,11 @@ const MovieCard = React.memo(React.forwardRef(({ movie, isFocused }, ref) => {
       className={`movie-card ${isFocused ? 'focused' : ''}`}
       data-movie-id={movie.id}
     >
-      <div className="movie-card-poster" onClick={()=>navigate(`/movie/${movie.id}`)}>
+      <div className="movie-card-poster" onClick={() => navigate(`/movie/${movie.id}`)}>
         <img
           src={posterUrl}
           alt={movie.title}
-          onError={(e) => {
-            e.target.src = '/placeholder.png';
-          }}
+          onError={handleImageError}
         />
       </div>
       <div className="movie-card-info">

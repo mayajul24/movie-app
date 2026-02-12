@@ -24,7 +24,8 @@ const MovieDetails = () => {
   const error = useSelector((state) => state.movies.error);
   const favorites = useSelector((state) => state.favorites.favorites);
 
-  const isFavorite = favorites.some((fav) => fav.id === parseInt(id));
+  const movieId = parseInt(id);
+  const isFavorite = favorites.some((fav) => fav.id === movieId);
 
   useEffect(() => {
     dispatch(fetchMovieDetailsRequest(id));
@@ -32,11 +33,11 @@ const MovieDetails = () => {
 
   const handleToggleFavorite = useCallback(() => {
     if (isFavorite) {
-      dispatch(removeFromFavorites(parseInt(id)));
+      dispatch(removeFromFavorites(movieId));
     } else if (movie) {
       dispatch(addToFavorites(movie));
     }
-  }, [isFavorite, id, movie, dispatch]);
+  }, [isFavorite, movieId, movie, dispatch]);
 
   const handleBack = useCallback(() => {
     navigate(-1);
@@ -105,6 +106,16 @@ const MovieDetails = () => {
     ? `${IMAGE_BASE_URL}/${POSTER_SIZE}${movie.poster_path}`
     : '/placeholder.png';
 
+  const isBackFocused = focusedButton === DETAIL_BUTTONS.BACK;
+  const isFavoriteFocused = focusedButton === DETAIL_BUTTONS.FAVORITE;
+
+  const backClassName = `movie-details-back ${isBackFocused ? 'keyboard-focused' : ''}`;
+  const favoriteClassName = [
+    'movie-details-favorite',
+    isFavorite && 'active',
+    isFavoriteFocused && 'keyboard-focused',
+  ].filter(Boolean).join(' ');
+
   return (
     <div className="movie-details">
       {backdropUrl && (
@@ -115,10 +126,7 @@ const MovieDetails = () => {
       )}
 
       <div className="movie-details-content">
-        <button
-          className={`movie-details-back ${focusedButton === DETAIL_BUTTONS.BACK ? 'keyboard-focused' : ''}`}
-          onClick={handleBack}
-        >
+        <button className={backClassName} onClick={handleBack}>
           ← Back
         </button>
 
@@ -140,7 +148,7 @@ const MovieDetails = () => {
                   📅 {new Date(movie.release_date).getFullYear()}
                 </span>
               )}
-              {movie.runtime && (
+              {movie.runtime > 0 && (
                 <span className="meta-item">⏱️ {movie.runtime} min</span>
               )}
               {movie.vote_average > 0 && (
@@ -150,7 +158,7 @@ const MovieDetails = () => {
               )}
             </div>
 
-            {movie.genres && movie.genres.length > 0 && (
+            {movie.genres?.length > 0 && (
               <div className="movie-details-genres">
                 {movie.genres.map((genre) => (
                   <span key={genre.id} className="genre-tag">
@@ -167,16 +175,13 @@ const MovieDetails = () => {
               </div>
             )}
 
-            <button
-              className={`movie-details-favorite ${isFavorite ? 'active' : ''} ${focusedButton === DETAIL_BUTTONS.FAVORITE ? 'keyboard-focused' : ''}`}
-              onClick={handleToggleFavorite}
-            >
+            <button className={favoriteClassName} onClick={handleToggleFavorite}>
               {isFavorite ? '❤️ Remove from Favorites' : '🤍 Add to Favorites'}
             </button>
           </div>
         </div>
 
-        {movie.production_companies && movie.production_companies.length > 0 && (
+        {movie.production_companies?.length > 0 && (
           <div className="movie-details-companies">
             <h3>Production Companies</h3>
             <div className="companies-list">
