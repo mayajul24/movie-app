@@ -187,3 +187,4 @@ npm run preview
 ## License
 
 This project is for educational purposes as part of a technical assessment.
+# movies-app
