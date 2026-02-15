@@ -21,13 +21,6 @@
   padding-top: 24px;
 }
 
-.home-controls-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
-}
-
 .home-content {
   margin-top: 8px;
 }

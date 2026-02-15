@@ -1,13 +1,25 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useDispatch } from 'react-redux';
-import { searchMoviesRequest, clearSearch } from '../store/actions';
-import { MIN_SEARCH_LENGTH } from '../constants';
+import { useDispatch, useSelector } from 'react-redux';
+import { searchMoviesRequest, clearSearch, setActiveSection } from '../store/actions';
+import { MIN_SEARCH_LENGTH, SECTIONS } from '../constants';
 import './SearchBar.css';
 
 const SearchBar = React.memo(() => {
   const dispatch = useDispatch();
+  const activeSection = useSelector((state) => state.navigation.activeSection);
   const [searchValue, setSearchValue] = useState('');
   const inputRef = useRef(null);
+
+  const isActive = activeSection === SECTIONS.SEARCH;
+
+  // Auto-focus/blur the input when section changes
+  useEffect(() => {
+    if (isActive) {
+      inputRef.current?.focus();
+    } else {
+      inputRef.current?.blur();
+    }
+  }, [isActive]);
 
   useEffect(() => {
     if (searchValue.length >= MIN_SEARCH_LENGTH) {
@@ -20,6 +32,10 @@ const SearchBar = React.memo(() => {
   const handleChange = useCallback((e) => {
     setSearchValue(e.target.value);
   }, []);
+
+  const handleFocus = useCallback(() => {
+    dispatch(setActiveSection(SECTIONS.SEARCH));
+  }, [dispatch]);
 
   const handleClear = useCallback(() => {
     setSearchValue('');
@@ -38,6 +54,7 @@ const SearchBar = React.memo(() => {
           placeholder="Search movies..."
           value={searchValue}
           onChange={handleChange}
+          onFocus={handleFocus}
           autoComplete="off"
         />
         {searchValue && (

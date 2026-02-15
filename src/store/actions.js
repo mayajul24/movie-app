@@ -81,8 +81,18 @@ export const loadFavorites = () => ({
 });
 
 // Navigation actions
+export const setActiveSection = (section) => ({
+  type: types.SET_ACTIVE_SECTION,
+  payload: { section },
+});
+
 export const setFocusedIndex = (index) => ({
   type: types.SET_FOCUSED_INDEX,
+  payload: { index },
+});
+
+export const setFocusedFilterIndex = (index) => ({
+  type: types.SET_FOCUSED_FILTER_INDEX,
   payload: { index },
 });
 

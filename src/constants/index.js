@@ -22,12 +22,27 @@ export const MIN_SEARCH_LENGTH = 2;
 // Category focus delay
 export const CATEGORY_FOCUS_DELAY_MS = 2000;
 
+// Navigation sections
+export const SECTIONS = {
+  SEARCH: 'search',
+  FILTERS: 'filters',
+  GRID: 'grid',
+  PAGINATION: 'pagination',
+};
+
 // Filter types
 export const FILTER_TYPES = {
   POPULAR: 'popular',
   AIRING_NOW: 'airing_now',
   FAVORITES: 'favorites',
 };
+
+// Ordered list of filters (matches FilterBar render order)
+export const FILTER_ORDER = [
+  FILTER_TYPES.POPULAR,
+  FILTER_TYPES.AIRING_NOW,
+  FILTER_TYPES.FAVORITES,
+];
 
 // Local storage keys
 export const FAVORITES_STORAGE_KEY = 'movieFavorites';

@@ -1,6 +1,28 @@
-.page-indicator {
-  font-size: 14px;
-  color: #999;
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 20px;
+  margin-top: 12px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.pagination-focused {
+  background-color: rgba(229, 9, 20, 0.1);
+  box-shadow: 0 0 0 2px #e50914;
+}
+
+.pagination-info {
+  font-size: 16px;
   font-weight: 600;
-  white-space: nowrap;
+  color: #fff;
+}
+
+.pagination-arrow-hint {
+  font-size: 18px;
+  color: #e50914;
+  min-width: 20px;
+  text-align: center;
 }

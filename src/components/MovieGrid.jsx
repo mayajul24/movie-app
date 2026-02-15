@@ -1,17 +1,12 @@
-import React, { useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation';
+import React from 'react';
+import { useSelector } from 'react-redux';
 import MovieCard from './MovieCard';
+import { SECTIONS } from '../constants';
 import './MovieGrid.css';
 
-const MovieGrid = React.memo(({ movies }) => {
-  const navigate = useNavigate();
-
-  const handleMovieSelect = useCallback((movie) => {
-    navigate(`/movie/${movie.id}`);
-  }, [navigate]);
-
-  const { focusedIndex, itemRefs } = useKeyboardNavigation(movies, handleMovieSelect);
+const MovieGrid = React.memo(({ movies, focusedIndex, itemRefs }) => {
+  const activeSection = useSelector((state) => state.navigation.activeSection);
+  const isGridActive = activeSection === SECTIONS.GRID;
 
   if (!movies || movies.length === 0) {
     return (
@@ -27,7 +22,7 @@ const MovieGrid = React.memo(({ movies }) => {
         <MovieCard
           key={movie.id}
           movie={movie}
-          isFocused={index === focusedIndex}
+          isFocused={isGridActive && index === focusedIndex}
           ref={(el) => (itemRefs.current[index] = el)}
         />
       ))}

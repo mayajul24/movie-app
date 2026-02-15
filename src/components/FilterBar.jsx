@@ -1,75 +1,69 @@
-import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setActiveFilter, fetchMoviesRequest } from '../store/actions';
-import { FILTER_TYPES, CATEGORY_FOCUS_DELAY_MS } from '../constants';
+import { FILTER_TYPES, FILTER_ORDER, CATEGORY_FOCUS_DELAY_MS, SECTIONS } from '../constants';
 import './FilterBar.css';
+
+const FILTER_LABELS = {
+  [FILTER_TYPES.POPULAR]: 'Popular',
+  [FILTER_TYPES.AIRING_NOW]: 'Airing Now',
+  [FILTER_TYPES.FAVORITES]: 'My Favorites',
+};
 
 const FilterBar = React.memo(() => {
   const dispatch = useDispatch();
   const activeFilter = useSelector((state) => state.movies.activeFilter);
-  const [focusedFilter, setFocusedFilter] = useState(null);
+  const activeSection = useSelector((state) => state.navigation.activeSection);
+  const focusedFilterIndex = useSelector((state) => state.navigation.focusedFilterIndex);
   const focusTimerRef = useRef(null);
 
-  const filters = useMemo(() => [
-    { type: FILTER_TYPES.POPULAR, label: 'Popular' },
-    { type: FILTER_TYPES.AIRING_NOW, label: 'Airing Now' },
-    { type: FILTER_TYPES.FAVORITES, label: 'My Favorites' },
-  ], []);
+  const isFiltersActive = activeSection === SECTIONS.FILTERS;
 
-  useEffect(() => {
-    return () => {
-      if (focusTimerRef.current) {
-        clearTimeout(focusTimerRef.current);
-      }
-    };
+  const clearTimer = useCallback(() => {
+    if (focusTimerRef.current) {
+      clearTimeout(focusTimerRef.current);
+      focusTimerRef.current = null;
+    }
   }, []);
+
+  // Clean up timer on unmount
+  useEffect(() => clearTimer, [clearTimer]);
+
+  // Start 2-second timer when keyboard focus changes a filter
+  useEffect(() => {
+    clearTimer();
+
+    if (isFiltersActive) {
+      const filterType = FILTER_ORDER[focusedFilterIndex];
+      focusTimerRef.current = setTimeout(() => {
+        dispatch(setActiveFilter(filterType));
+        dispatch(fetchMoviesRequest(filterType, 1));
+      }, CATEGORY_FOCUS_DELAY_MS);
+    }
+  }, [isFiltersActive, focusedFilterIndex, dispatch, clearTimer]);
 
   const handleFilterClick = useCallback((filterType) => {
-    if (focusTimerRef.current) {
-      clearTimeout(focusTimerRef.current);
-      focusTimerRef.current = null;
-    }
+    clearTimer();
     dispatch(setActiveFilter(filterType));
     dispatch(fetchMoviesRequest(filterType, 1));
-  }, [dispatch]);
-
-  const handleFilterFocus = useCallback((filterType) => {
-    setFocusedFilter(filterType);
-    if (focusTimerRef.current) {
-      clearTimeout(focusTimerRef.current);
-    }
-    focusTimerRef.current = setTimeout(() => {
-      dispatch(setActiveFilter(filterType));
-      dispatch(fetchMoviesRequest(filterType, 1));
-    }, CATEGORY_FOCUS_DELAY_MS);
-  }, [dispatch]);
-
-  const handleFilterBlur = useCallback(() => {
-    setFocusedFilter(null);
-    if (focusTimerRef.current) {
-      clearTimeout(focusTimerRef.current);
-      focusTimerRef.current = null;
-    }
-  }, []);
+  }, [dispatch, clearTimer]);
 
   return (
     <div className="filter-bar">
-      {filters.map((filter) => {
+      {FILTER_ORDER.map((filterType, index) => {
         const className = [
           'filter-button',
-          activeFilter === filter.type && 'active',
-          focusedFilter === filter.type && 'focused',
+          activeFilter === filterType && 'active',
+          isFiltersActive && focusedFilterIndex === index && 'focused',
         ].filter(Boolean).join(' ');
 
         return (
           <button
-            key={filter.type}
+            key={filterType}
             className={className}
-            onClick={() => handleFilterClick(filter.type)}
-            onFocus={() => handleFilterFocus(filter.type)}
-            onBlur={handleFilterBlur}
+            onClick={() => handleFilterClick(filterType)}
           >
-            {filter.label}
+            {FILTER_LABELS[filterType]}
           </button>
         );
       })}
