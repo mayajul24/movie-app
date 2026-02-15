@@ -12,7 +12,7 @@ const Pagination = React.memo(() => {
 
   const isActive = activeSection === SECTIONS.PAGINATION;
 
-  // Scroll pagination into view when focused or page changes
+  // Scroll pagination into view when focused
   useEffect(() => {
     if (isActive && paginationRef.current) {
       paginationRef.current.scrollIntoView({
@@ -20,7 +20,7 @@ const Pagination = React.memo(() => {
         block: 'nearest',
       });
     }
-  }, [isActive, currentPage]);
+  }, [isActive]);
 
   if (activeFilter === FILTER_TYPES.FAVORITES || totalPages <= 1) {
     return null;

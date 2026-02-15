@@ -171,10 +171,18 @@ export const useKeyboardNavigation = (items, onSelect) => {
       event.preventDefault();
       switch (event.key) {
         case KEYS.ARROW_LEFT:
-          if (!loading && currentPage > 1) fetchPage(currentPage - 1);
+          if (!loading && currentPage > 1) {
+            fetchPage(currentPage - 1);
+            dispatch(setFocusedIndex(0));
+            dispatch(setActiveSection(SECTIONS.GRID));
+          }
           break;
         case KEYS.ARROW_RIGHT:
-          if (!loading && hasNextPage) fetchPage(currentPage + 1);
+          if (!loading && hasNextPage) {
+            fetchPage(currentPage + 1);
+            dispatch(setFocusedIndex(0));
+            dispatch(setActiveSection(SECTIONS.GRID));
+          }
           break;
         case KEYS.ARROW_UP:
           dispatch(setActiveSection(SECTIONS.GRID));
