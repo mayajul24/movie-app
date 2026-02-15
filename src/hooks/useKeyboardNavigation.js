@@ -15,8 +15,10 @@ import {
   searchMoviesRequest,
 } from '../store/actions';
 import {
-  KEYS, ITEMS_PER_ROW,
-  SECTIONS, FILTER_ORDER,
+  KEYS,
+  ITEMS_PER_ROW,
+  SECTIONS,
+  FILTER_ORDER,
 } from '../constants';
 
 const isOnFirstRow = (index) => index < ITEMS_PER_ROW;
@@ -39,36 +41,48 @@ export const useKeyboardNavigation = (items, onSelect) => {
 
   const hasNextPage = currentPage < totalPages;
 
-  const fetchPage = useCallback((page) => {
-    dispatch(setCurrentPage(page));
-    if (isSearching && searchQuery) {
-      dispatch(searchMoviesRequest(searchQuery, page));
-    } else {
-      dispatch(fetchMoviesRequest(activeFilter, page));
-    }
-  }, [dispatch, isSearching, searchQuery, activeFilter]);
+  const fetchPage = useCallback(
+      (page) => {
+        dispatch(setCurrentPage(page));
+        if (isSearching && searchQuery) {
+          dispatch(searchMoviesRequest(searchQuery, page));
+        } else {
+          dispatch(fetchMoviesRequest(activeFilter, page));
+        }
+      },
+      [dispatch, isSearching, searchQuery, activeFilter]
+  );
 
-  const activateFilter = useCallback((filterType) => {
-    dispatch(setActiveFilter(filterType));
-    dispatch(fetchMoviesRequest(filterType, 1));
-  }, [dispatch]);
+  const activateFilter = useCallback(
+      (filterType) => {
+        dispatch(setActiveFilter(filterType));
+        dispatch(fetchMoviesRequest(filterType, 1));
+      },
+      [dispatch]
+  );
 
-  // Clamp focusedIndex when items shrink
+  // Clamp focusedIndex if items shrink
   useEffect(() => {
     if (items.length > 0 && focusedIndex >= items.length) {
       dispatch(setFocusedIndex(items.length - 1));
     }
   }, [focusedIndex, items.length, dispatch]);
 
-  // Scroll management based on active section
+  // Scroll into view based on focusedIndex
+  const isInitialMount = useRef(true);
   useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
+    if (activeSection === SECTIONS.PAGINATION) return;
+
     if (activeSection === SECTIONS.SEARCH || activeSection === SECTIONS.FILTERS) {
       document.getElementById('root')?.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
-    if (activeSection === SECTIONS.PAGINATION) {
-      return; // Pagination component handles its own scroll-into-view
-    }
+
     if (isOnFirstRow(focusedIndex)) {
       document.getElementById('root')?.scrollTo({ top: 0, behavior: 'smooth' });
     } else if (itemRefs.current[focusedIndex]) {
@@ -79,6 +93,11 @@ export const useKeyboardNavigation = (items, onSelect) => {
       });
     }
   }, [focusedIndex, activeSection]);
+
+  // Reset isInitialMount on unmount (needed for StrictMode double-fire)
+  useEffect(() => {
+    return () => { isInitialMount.current = true; };
+  }, []);
 
   // Keyboard event handler
   useEffect(() => {
@@ -91,8 +110,6 @@ export const useKeyboardNavigation = (items, onSelect) => {
         case KEYS.ESCAPE:
           event.preventDefault();
           dispatch(setActiveSection(SECTIONS.GRID));
-          break;
-        default:
           break;
       }
     };
@@ -107,22 +124,18 @@ export const useKeyboardNavigation = (items, onSelect) => {
           dispatch(setActiveSection(SECTIONS.GRID));
           break;
         case KEYS.ARROW_LEFT:
-          if (focusedFilterIndex > 0) {
+          if (focusedFilterIndex > 0)
             dispatch(setFocusedFilterIndex(focusedFilterIndex - 1));
-          }
           break;
         case KEYS.ARROW_RIGHT:
-          if (focusedFilterIndex < FILTER_ORDER.length - 1) {
+          if (focusedFilterIndex < FILTER_ORDER.length - 1)
             dispatch(setFocusedFilterIndex(focusedFilterIndex + 1));
-          }
           break;
         case KEYS.ENTER:
           activateFilter(FILTER_ORDER[focusedFilterIndex]);
           break;
         case KEYS.ESCAPE:
           dispatch(setActiveSection(SECTIONS.GRID));
-          break;
-        default:
           break;
       }
     };
@@ -131,38 +144,24 @@ export const useKeyboardNavigation = (items, onSelect) => {
       event.preventDefault();
       switch (event.key) {
         case KEYS.ARROW_UP:
-          if (!isOnFirstRow(focusedIndex)) {
-            dispatch(navigateUp());
-          } else {
-            dispatch(setActiveSection(SECTIONS.FILTERS));
-          }
+          if (!isOnFirstRow(focusedIndex)) dispatch(navigateUp());
+          else dispatch(setActiveSection(SECTIONS.FILTERS));
           break;
         case KEYS.ARROW_DOWN:
-          if (!isOnLastRow(focusedIndex, items.length)) {
-            dispatch(navigateDown());
-          } else if (hasNextPage) {
-            dispatch(setActiveSection(SECTIONS.PAGINATION));
-          }
+          if (!isOnLastRow(focusedIndex, items.length)) dispatch(navigateDown());
+          else if (hasNextPage) dispatch(setActiveSection(SECTIONS.PAGINATION));
           break;
         case KEYS.ARROW_LEFT:
-          if (focusedIndex > 0) {
-            dispatch(navigateLeft());
-          }
+          if (focusedIndex > 0) dispatch(navigateLeft());
           break;
         case KEYS.ARROW_RIGHT:
-          if (focusedIndex < items.length - 1) {
-            dispatch(navigateRight());
-          }
+          if (focusedIndex < items.length - 1) dispatch(navigateRight());
           break;
         case KEYS.ENTER:
-          if (items[focusedIndex] && onSelect) {
-            onSelect(items[focusedIndex]);
-          }
+          if (items[focusedIndex] && onSelect) onSelect(items[focusedIndex]);
           break;
         case KEYS.ESCAPE:
           navigate(-1);
-          break;
-        default:
           break;
       }
     };
@@ -185,12 +184,8 @@ export const useKeyboardNavigation = (items, onSelect) => {
           }
           break;
         case KEYS.ARROW_UP:
-          dispatch(setActiveSection(SECTIONS.GRID));
-          break;
         case KEYS.ESCAPE:
           dispatch(setActiveSection(SECTIONS.GRID));
-          break;
-        default:
           break;
       }
     };
@@ -220,9 +215,18 @@ export const useKeyboardNavigation = (items, onSelect) => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [
-    activeSection, focusedIndex, focusedFilterIndex,
-    items, onSelect, dispatch, navigate,
-    fetchPage, activateFilter, currentPage, hasNextPage, loading,
+    activeSection,
+    focusedIndex,
+    focusedFilterIndex,
+    items,
+    onSelect,
+    dispatch,
+    navigate,
+    fetchPage,
+    activateFilter,
+    currentPage,
+    hasNextPage,
+    loading,
   ]);
 
   return { focusedIndex, itemRefs };

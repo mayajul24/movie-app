@@ -23,4 +23,5 @@
 
 .home-content {
   margin-top: 8px;
+  min-height: 100vh;
 }
