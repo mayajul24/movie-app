@@ -35,6 +35,7 @@ export const useKeyboardNavigation = (items, onSelect) => {
   const activeFilter = useSelector((state) => state.movies.activeFilter);
   const searchQuery = useSelector((state) => state.movies.searchQuery);
   const isSearching = useSelector((state) => state.movies.isSearching);
+  const loading = useSelector((state) => state.movies.loading);
 
   const hasNextPage = currentPage < totalPages;
 
@@ -170,10 +171,10 @@ export const useKeyboardNavigation = (items, onSelect) => {
       event.preventDefault();
       switch (event.key) {
         case KEYS.ARROW_LEFT:
-          if (currentPage > 1) fetchPage(currentPage - 1);
+          if (!loading && currentPage > 1) fetchPage(currentPage - 1);
           break;
         case KEYS.ARROW_RIGHT:
-          if (hasNextPage) fetchPage(currentPage + 1);
+          if (!loading && hasNextPage) fetchPage(currentPage + 1);
           break;
         case KEYS.ARROW_UP:
           dispatch(setActiveSection(SECTIONS.GRID));
@@ -213,7 +214,7 @@ export const useKeyboardNavigation = (items, onSelect) => {
   }, [
     activeSection, focusedIndex, focusedFilterIndex,
     items, onSelect, dispatch, navigate,
-    fetchPage, activateFilter, currentPage, hasNextPage,
+    fetchPage, activateFilter, currentPage, hasNextPage, loading,
   ]);
 
   return { focusedIndex, itemRefs };
